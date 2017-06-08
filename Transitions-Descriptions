@@ -1,0 +1,27 @@
+UIViewController Transitions
+
+	# definesPresentationContext { 
+		- определяет на каком контроллере будет происходить презентация, true - на текущем, false - на rootViewController;
+		- по умолчанию false, в UINavigationController, UITabBarController - true;
+	}
+	# providesPresentationContextTransitionStyle - определяет откуда будет считываться стиль для презентации, true - из контроллера презентера, false - из презентуемого контроллера; работает если включен definesPresentationContext;
+	# UIModalPresentationStyle
+		# fullScreen - презентация происходит на весь экран, вью из контроллера презентера удаляется на время отображения презентационного контроллера
+		# pageSheet - презентация происходит с максимальной шириной в ширину портрета, высота равна высоте экрана
+		# formSheet - презентация происходит с отступами от всех краев в виде отдельного окна
+		# currentContext {
+			- презентация происходит поверх(вместо view контроллера, на UITransitionView) контроллера в котором definesPresentationContext == true;
+			- в контент-popover контроллере с этим параметром, UIModalTransitionStyle поддерживается только c coverVertical; Прим.: на практике доступны все transition стили (за исключением .curl);
+		}
+		# custom - пользовательский переход, описанный через делегат UIViewControllerTransitionDelegate
+		# overFullScreen - показывается поверх презент контроллера, вью не удаляются из иерархии
+		# overCurrentContext - показывается поверх презент контроллера c definePresentationContext == true, вью не удаляются из иерархии
+		# popover {
+			- modalTransitionStyle не имеет эффекта
+			- презентация контроллеров со стилем перехода .pageCurl приведет к крашу
+		}
+		# none - не следует использовать в качестве стиля презентации, используется в UIAdaptivePresentationControllerDelegate
+
+	# UIViewControllerTransitioningDelegate - отвечает за процесс перехода
+		# animationController(forDismissed(forPresented) - контроллеры для анимации презентации(удаления) вью контроллера, отвечают за внешние анимации (анимации в простанстве презентера)
+		# presentationController(forPresented - контроллер отвечающий за стиль презентационного вью контроллера, его формы, размера, анимации

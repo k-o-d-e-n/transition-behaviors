@@ -14,6 +14,10 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		A449EAE51EE8956C00008F31 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A449EAE41EE8956C00008F31 /* TableViewController.swift */; };
+		A449EAE91EE8BD5300008F31 /* SlideInPresentationAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A449EAE61EE8BD5300008F31 /* SlideInPresentationAnimator.swift */; };
+		A449EAEA1EE8BD5300008F31 /* SlideInPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A449EAE71EE8BD5300008F31 /* SlideInPresentationController.swift */; };
+		A449EAEB1EE8BD5300008F31 /* SlideInPresentationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A449EAE81EE8BD5300008F31 /* SlideInPresentationManager.swift */; };
 		CBA053B8368C08959F5E21CB /* Pods_TransitionBehaviors_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCBA340068C77701FA733D23 /* Pods_TransitionBehaviors_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -29,7 +33,7 @@
 
 /* Begin PBXFileReference section */
 		4AC46B1B112D1CE7F50F83BA /* Pods-TransitionBehaviors_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitionBehaviors_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TransitionBehaviors_Tests/Pods-TransitionBehaviors_Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		4EF048169855CE570F8333FA /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		4EF048169855CE570F8333FA /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* TransitionBehaviors_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TransitionBehaviors_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -40,12 +44,16 @@
 		607FACE51AFB9204008FA782 /* TransitionBehaviors_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransitionBehaviors_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
-		6B525ECE1E694050B3E377E6 /* TransitionBehaviors.podspec */ = {isa = PBXFileReference; includeInIndex = 1; name = TransitionBehaviors.podspec; path = ../TransitionBehaviors.podspec; sourceTree = "<group>"; };
+		6B525ECE1E694050B3E377E6 /* TransitionBehaviors.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TransitionBehaviors.podspec; path = ../TransitionBehaviors.podspec; sourceTree = "<group>"; };
 		7137B46EEA053879DE06EA65 /* Pods_TransitionBehaviors_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TransitionBehaviors_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A447A566B0D0895D863D2EA8 /* Pods-TransitionBehaviors_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitionBehaviors_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TransitionBehaviors_Tests/Pods-TransitionBehaviors_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		A449EAE41EE8956C00008F31 /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+		A449EAE61EE8BD5300008F31 /* SlideInPresentationAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlideInPresentationAnimator.swift; sourceTree = "<group>"; };
+		A449EAE71EE8BD5300008F31 /* SlideInPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlideInPresentationController.swift; sourceTree = "<group>"; };
+		A449EAE81EE8BD5300008F31 /* SlideInPresentationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlideInPresentationManager.swift; sourceTree = "<group>"; };
 		AAA9FD59E43966A866DCF4A5 /* Pods-TransitionBehaviors_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitionBehaviors_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-TransitionBehaviors_Example/Pods-TransitionBehaviors_Example.release.xcconfig"; sourceTree = "<group>"; };
 		DCBA340068C77701FA733D23 /* Pods_TransitionBehaviors_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TransitionBehaviors_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		EC5A0A219F53A18B97A01A7C /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		EC5A0A219F53A18B97A01A7C /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		EE2F1B260DFD32B1D681BE31 /* Pods-TransitionBehaviors_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitionBehaviors_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TransitionBehaviors_Example/Pods-TransitionBehaviors_Example.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -102,12 +110,16 @@
 		607FACD21AFB9204008FA782 /* Example for TransitionBehaviors */ = {
 			isa = PBXGroup;
 			children = (
+				A449EAE61EE8BD5300008F31 /* SlideInPresentationAnimator.swift */,
+				A449EAE71EE8BD5300008F31 /* SlideInPresentationController.swift */,
+				A449EAE81EE8BD5300008F31 /* SlideInPresentationManager.swift */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
+				A449EAE41EE8956C00008F31 /* TableViewController.swift */,
 			);
 			name = "Example for TransitionBehaviors";
 			path = TransitionBehaviors;
@@ -362,6 +374,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				A449EAE91EE8BD5300008F31 /* SlideInPresentationAnimator.swift in Sources */,
+				A449EAE51EE8956C00008F31 /* TableViewController.swift in Sources */,
+				A449EAEA1EE8BD5300008F31 /* SlideInPresentationController.swift in Sources */,
+				A449EAEB1EE8BD5300008F31 /* SlideInPresentationManager.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -502,6 +518,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -516,6 +533,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
