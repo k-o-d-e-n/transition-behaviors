@@ -118,7 +118,6 @@ public protocol PresentConfiguration {
 }
 
 public struct ViewControllerBasedTransition<Source: UIViewController, Target: UIViewController>: ViewControllerBasedTransitionBehavior {
-//    let base: ViewControllerBasedTransitionBehavior
     let isAvailable: (Source) -> Bool
     let action: (Source, [Target], Bool) -> Void
     
@@ -128,69 +127,161 @@ public struct ViewControllerBasedTransition<Source: UIViewController, Target: UI
     }
     
     public func isAvailable(in sourceViewController: Source) -> Bool {
-//        return base.isAvailable(in: sourceViewController)
-        return isAvailable(in: sourceViewController)
+        return isAvailable(sourceViewController)
     }
     
     public func perform(in sourceViewController: Source, to viewControllers: [Target], animated: Bool) {
-//        base.perform(in: sourceViewController, to: viewControllers, animated: animated)
         action(sourceViewController, viewControllers, animated)
     }
     
-    public static var push: ViewControllerBasedTransition<UIViewController, UIViewController> {
+}
+
+// MARK: ViewControllerBased - UINavigationController
+
+extension ViewControllerBasedTransition {
+    struct AnyChildNavigation<T: ViewControllerBasedTransitionBehavior>: ViewControllerBasedTransitionBehavior where T.Source == UINavigationController {
+        let navigationBehavior: T
+        
+        func isAvailable(in sourceViewController: UIViewController) -> Bool {
+            return sourceViewController.navigationController.map { navigationBehavior.isAvailable(in: $0) } ?? false
+        }
+        func perform(in sourceViewController: UIViewController, to viewControllers: [T.Target], animated: Bool) {
+            navigationBehavior.perform(in: sourceViewController.navigationController!, to: viewControllers, animated: animated)
+        }
+    }
+    
+    public static var push: ViewControllerBasedTransition<UINavigationController, UIViewController> {
         return .init(base: Push())
     }
     struct Push: ViewControllerBasedTransitionBehavior {
-        func isAvailable(in sourceViewController: UIViewController) -> Bool {
-            return sourceViewController.navigationController != nil
+        func isAvailable(in sourceViewController: UINavigationController) -> Bool {
+            return true
         }
         
-        func perform(in sourceViewController: UIViewController, to viewController: [UIViewController], animated: Bool) {
-            let navController = sourceViewController.navigationController!
-            navController.setViewControllers(navController.viewControllers + viewController,
-                                             animated: true)
+        func perform(in sourceViewController: UINavigationController, to viewController: [UIViewController], animated: Bool) {
+            sourceViewController.setViewControllers(sourceViewController.viewControllers + viewController,
+                                                    animated: true)
         }
     }
+    public static var navigationPush: ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: AnyChildNavigation(navigationBehavior: Push()))
+    }
+    /* Uncomment if require additional behavior instead AnyChildNavigation
+    struct ChildPush: ViewControllerBasedTransitionBehavior {
+        let navigationPush: Push
+        func isAvailable(in sourceViewController: UIViewController) -> Bool {
+            return sourceViewController.navigationController.map { navigationPush.isAvailable(in: $0) } ?? false
+        }
+        
+        func perform(in sourceViewController: UIViewController, to viewControllers: [UIViewController], animated: Bool) {
+            navigationPush.perform(in: sourceViewController.navigationController!, to: viewControllers, animated: animated)
+        }
+    }
+     */
     
-    // TODO: Add Pop behavior?
+    public static var pop: ViewControllerBasedTransition<UINavigationController, UIViewController> {
+        return .pop(left: 1)
+    }
+    public static func pop(left: Int) -> ViewControllerBasedTransition<UINavigationController, UIViewController> {
+        return .init(base: Pop(left: left))
+    }
+    struct Pop: ViewControllerBasedTransitionBehavior {
+        let left: Int
+        func isAvailable(in sourceViewController: UINavigationController) -> Bool {
+            return sourceViewController.viewControllers.count >= left
+        }
+        
+        func perform(in sourceViewController: UINavigationController, to viewControllers: [UIViewController], animated: Bool) {
+            guard let to = viewControllers.first else {
+                let stack = sourceViewController.viewControllers
+                sourceViewController.setViewControllers(Array(stack[0 ..< stack.count - left]), animated: animated)
+                return
+            }
+            
+            sourceViewController.popToViewController(to, animated: animated)
+        }
+    }
+    public static var navigationPop: ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .navigationPop(left: 1)
+    }
+    public static func navigationPop(left: Int) -> ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: AnyChildNavigation(navigationBehavior: Pop(left: left)))
+    }
     
     // TODO: After transition to Swift 4, implement replace with range limited by one side
-    public static var replace: ViewControllerBasedTransition<UIViewController, UIViewController> {
-        return .init(base: Replace(last: 1))
+    public static var replace: ViewControllerBasedTransition<UINavigationController, UIViewController> {
+        return .replace(last: 1)
     }
-    public static func replace(last: Int) -> ViewControllerBasedTransition<UIViewController, UIViewController> {
+    public static func replace(last: Int) -> ViewControllerBasedTransition<UINavigationController, UIViewController> {
         return .init(base: Replace(last: last))
     }
     struct Replace: ViewControllerBasedTransitionBehavior {
         let last: Int
         
+        func isAvailable(in sourceViewController: UINavigationController) -> Bool {
+            return sourceViewController.viewControllers.count >= last
+        }
+        
+        func perform(in sourceViewController: UINavigationController, to viewControllers: [UIViewController], animated: Bool) {
+            let stack = sourceViewController.viewControllers
+            sourceViewController.setViewControllers(stack[0 ..< stack.count - last] + viewControllers,
+                                                    animated: animated)
+        }
+    }
+    public static var navigationReplace: ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: AnyChildNavigation(navigationBehavior: Replace(last: 1)))
+    }
+    public static func navigationReplace(last: Int) -> ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: AnyChildNavigation(navigationBehavior: Replace(last: last)))
+    }
+    /* Uncomment if require additional behavior instead AnyChildNavigation
+    struct ChildReplace: ViewControllerBasedTransitionBehavior {
+        let navigationReplace: Replace
+        
         func isAvailable(in sourceViewController: UIViewController) -> Bool {
-            return sourceViewController.navigationController.map { $0.viewControllers.count >= last } ?? false
+            return sourceViewController.navigationController.map { navigationReplace.isAvailable(in: $0) } ?? false
         }
         
         func perform(in sourceViewController: UIViewController, to viewControllers: [UIViewController], animated: Bool) {
-            let navController = sourceViewController.navigationController!
-            let stack = navController.viewControllers
-            navController.setViewControllers(stack[0 ..< stack.count - last] + viewControllers,
-                                             animated: animated)
+            navigationReplace.perform(in: sourceViewController.navigationController!, to: viewControllers, animated: true)
         }
     }
+     */
     
+    public static var root: ViewControllerBasedTransition<UINavigationController, UIViewController> {
+        return .init(base: Root())
+    }
+    struct Root: ViewControllerBasedTransitionBehavior {
+        func isAvailable(in sourceViewController: UINavigationController) -> Bool {
+            return true
+        }
+        
+        func perform(in sourceViewController: UINavigationController, to viewControllers: [UIViewController], animated: Bool) {
+            sourceViewController.setViewControllers(viewControllers, animated: animated)
+        }
+    }
     public static var navigationRoot: ViewControllerBasedTransition<UIViewController, UIViewController> {
-        return .init(base: NavigationRoot())
+        return .init(base: AnyChildNavigation(navigationBehavior: Root()))
     }
+    /* Uncomment if require additional behavior instead AnyChildNavigation
     struct NavigationRoot: ViewControllerBasedTransitionBehavior {
+        let navigationRoot: Root
         func isAvailable(in sourceViewController: UIViewController) -> Bool {
-            return sourceViewController.navigationController != nil
+            return sourceViewController.navigationController.map { navigationRoot.isAvailable(in: $0) } ?? false
         }
         
         func perform(in sourceViewController: UIViewController, to viewControllers: [UIViewController], animated: Bool) {
-            sourceViewController.navigationController!.setViewControllers(viewControllers, animated: animated)
+            navigationRoot.perform(in: sourceViewController.navigationController!, to: viewControllers, animated: animated)
         }
     }
-    
+     */
+}
+
+// MARK: ViewControllerBased - Presentation
+
+extension ViewControllerBasedTransition {
     public static var present: ViewControllerBasedTransition<UIViewController, UIViewController> {
-        return .init(base: Present(config: .common(modalStyle: .fullScreen, transitionStyle: .coverVertical), completion: nil))
+        return .present(as: .common(modalStyle: .fullScreen, transitionStyle: .coverVertical))
     }
     public static func present(as configured: Present.Config, completion: (() -> Void)? = nil) -> ViewControllerBasedTransition<UIViewController, UIViewController> {
         return .init(base: Present(config: configured, completion: completion))
@@ -278,6 +369,128 @@ public struct ViewControllerBasedTransition<Source: UIViewController, Target: UI
     }
 }
 
+// MARK: ViewControllerBased - UITabBarController
+
+extension ViewControllerBasedTransition {
+    public static func addRemove(added: IndexSet = [], removed: IndexSet = []) -> ViewControllerBasedTransition<UITabBarController, UIViewController> {
+        return .init(base: TabBarAddRemove(addRemove: .init(added: added, removed: removed)))
+    }
+    
+    struct TabBarAddRemove: ViewControllerBasedTransitionBehavior {
+        let addRemove: AddRemove
+        struct AddRemove {
+            let added: IndexSet
+            let removed: IndexSet
+            
+            func isConsistent<T>(with source: [T], addedEntities: [T]) -> Bool {
+                guard isConsistentRemoved(source: source) else { return false }
+                guard added.count == addedEntities.count else { return false }
+                guard added.count > 0 else { return true }
+                guard added.last! <= source.count else {
+                    var prev = source.count
+                    while let next = added.integerGreaterThan(prev) {
+                        guard prev == next - 1 else {
+                            return false
+                        }
+                        prev = next
+                    }
+                    return true
+                }
+                
+                return true
+            }
+            
+            func isConsistentRemoved<T>(source: [T]) -> Bool {
+                guard let max = removed.last else { return true }
+                
+                return source.endIndex >= max
+            }
+            
+            func apply<T>(for array: [T], added entities: [T]) -> [T] {
+                var array = array
+                removed.reversed().forEach { array.remove(at: $0) }
+                var iterator = entities.makeIterator()
+                added.forEach { array.insert(iterator.next()!, at: $0) }
+                
+                return array
+            }
+        }
+        
+        func isAvailable(in sourceViewController: UITabBarController) -> Bool {
+            return true
+        }
+        
+        func perform(in sourceViewController: UITabBarController, to viewControllers: [UIViewController], animated: Bool) {
+            let controllers = sourceViewController.viewControllers!
+            guard addRemove.isConsistent(with: controllers, addedEntities: viewControllers) else { return }
+            
+            sourceViewController.setViewControllers(addRemove.apply(for: controllers, added: viewControllers),
+                                                    animated: animated)
+        }
+    }
+    
+    public static func tabBarAddRemove(added: IndexSet = [], removed: IndexSet = []) -> ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: AnyChildTabBar(tabBarBehavior: TabBarAddRemove(addRemove: .init(added: added, removed: removed))))
+    }
+    struct AnyChildTabBar<T: ViewControllerBasedTransitionBehavior>: ViewControllerBasedTransitionBehavior where T.Source == UITabBarController {
+        let tabBarBehavior: T
+        
+        func isAvailable(in sourceViewController: UIViewController) -> Bool {
+            return sourceViewController.tabBarController.map { tabBarBehavior.isAvailable(in: $0) } ?? false
+        }
+        
+        func perform(in sourceViewController: UIViewController, to viewControllers: [T.Target], animated: Bool) {
+            tabBarBehavior.perform(in: sourceViewController.tabBarController!, to: viewControllers, animated: animated)
+        }
+    }
+}
+
+// MARK: UIViewController - Extensions
+
+public extension UIViewController {
+    func isAvailable<T: ViewControllerBasedTransitionBehavior>(transition: T) -> Bool {
+        return transition.isAvailable(in: self as! T.Source)
+    }
+    
+    func perform<T: ViewControllerBasedTransitionBehavior>(transition: T, to viewControllers: [T.Target], animated: Bool) {
+        transition.perform(in: self as! T.Source,
+                           to: viewControllers,
+                           animated: animated)
+    }
+}
+
+public extension UIViewController {
+    func perform(presetTransition transition: ViewControllerBasedTransition<UIViewController, UIViewController>, to viewControllers: UIViewController? ..., animated: Bool) {
+        transition.perform(in: self, to: viewControllers.flatMap { $0 }, animated: animated)
+    }
+    
+    @discardableResult
+    func perform(presetTransitionIfAvailable transition: ViewControllerBasedTransition<UIViewController, UIViewController>, to viewControllers: UIViewController? ..., animated: Bool, reserved: (ViewControllerBasedTransition<UIViewController, UIViewController>, Bool)) -> Bool {
+        let to = viewControllers.flatMap { $0 }
+        guard isAvailable(transition: transition) else {
+            perform(transition: reserved.0, to: to, animated: reserved.1)
+            return false
+        }
+        
+        perform(transition: transition, to: to, animated: animated)
+        return true
+    }
+}
+
+public extension UINavigationController {
+    func perform(navigationTransition transition: ViewControllerBasedTransition<UINavigationController, UIViewController>, to viewControllers: UIViewController? ..., animated: Bool) {
+        transition.perform(in: self, to: viewControllers.flatMap { $0 }, animated: animated)
+    }
+}
+
+public extension UITabBarController {
+    func perform(tabBarTransition transition: ViewControllerBasedTransition<UITabBarController, UIViewController>, to viewControllers: UIViewController? ..., animated: Bool) {
+        transition.perform(in: self, to: viewControllers.flatMap { $0 }, animated: animated)
+    }
+}
+
+// MARK: Undepended
+
 public struct AnyViewControllerBasedTransitionBehavior<S: UIViewController, T: UIViewController>: ViewControllerBasedTransitionBehavior {
     public typealias TransitionAvailable = (Source) -> Bool
     public typealias TransitionAction = (Source, [Target], Bool) -> Void
@@ -286,7 +499,7 @@ public struct AnyViewControllerBasedTransitionBehavior<S: UIViewController, T: U
     private let action: TransitionAction
     
     public init(available: @escaping TransitionAvailable, action: @escaping TransitionAction) {
-        self.available = available 
+        self.available = available
         self.action = action
     }
     
@@ -299,28 +512,3 @@ public struct AnyViewControllerBasedTransitionBehavior<S: UIViewController, T: U
     }
 }
 
-public extension UIViewController {
-    func isAvailable<T: ViewControllerBasedTransitionBehavior>(transition: T) -> Bool {
-        return transition.isAvailable(in: self as! T.Source)
-    }
-    
-    func perform<T: ViewControllerBasedTransitionBehavior>(transition: T, to viewControllers: [T.Target], animated: Bool) {
-        transition.perform(in: self as! T.Source,
-                           to: viewControllers,
-                           animated: animated)
-    }
-    
-    @discardableResult
-    func perform<T: ViewControllerBasedTransitionBehavior>(transitionIfAvailable transition: T, to viewControllers: [T.Target], animated: Bool) -> Bool {
-        guard isAvailable(transition: transition) else { return false }
-        
-        perform(transition: transition, to: viewControllers, animated: animated)
-        return true
-    }
-}
-
-public extension UIViewController {
-    func perform<Source: UIViewController, Target: UIViewController>(presetTransition transition: ViewControllerBasedTransition<Source, Target>, to viewControllers: Target ..., animated: Bool) {
-        transition.perform(in: self as! Source, to: viewControllers, animated: animated)
-    }
-}

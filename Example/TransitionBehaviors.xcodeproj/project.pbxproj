@@ -18,6 +18,7 @@
 		A449EAE91EE8BD5300008F31 /* SlideInPresentationAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A449EAE61EE8BD5300008F31 /* SlideInPresentationAnimator.swift */; };
 		A449EAEA1EE8BD5300008F31 /* SlideInPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A449EAE71EE8BD5300008F31 /* SlideInPresentationController.swift */; };
 		A449EAEB1EE8BD5300008F31 /* SlideInPresentationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A449EAE81EE8BD5300008F31 /* SlideInPresentationManager.swift */; };
+		A4FD06C21EE9AD7700F1D248 /* TabBarItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4FD06C11EE9AD7700F1D248 /* TabBarItemViewController.swift */; };
 		CBA053B8368C08959F5E21CB /* Pods_TransitionBehaviors_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCBA340068C77701FA733D23 /* Pods_TransitionBehaviors_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +52,7 @@
 		A449EAE61EE8BD5300008F31 /* SlideInPresentationAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlideInPresentationAnimator.swift; sourceTree = "<group>"; };
 		A449EAE71EE8BD5300008F31 /* SlideInPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlideInPresentationController.swift; sourceTree = "<group>"; };
 		A449EAE81EE8BD5300008F31 /* SlideInPresentationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlideInPresentationManager.swift; sourceTree = "<group>"; };
+		A4FD06C11EE9AD7700F1D248 /* TabBarItemViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarItemViewController.swift; sourceTree = "<group>"; };
 		AAA9FD59E43966A866DCF4A5 /* Pods-TransitionBehaviors_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitionBehaviors_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-TransitionBehaviors_Example/Pods-TransitionBehaviors_Example.release.xcconfig"; sourceTree = "<group>"; };
 		DCBA340068C77701FA733D23 /* Pods_TransitionBehaviors_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TransitionBehaviors_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC5A0A219F53A18B97A01A7C /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -110,9 +112,8 @@
 		607FACD21AFB9204008FA782 /* Example for TransitionBehaviors */ = {
 			isa = PBXGroup;
 			children = (
-				A449EAE61EE8BD5300008F31 /* SlideInPresentationAnimator.swift */,
-				A449EAE71EE8BD5300008F31 /* SlideInPresentationController.swift */,
-				A449EAE81EE8BD5300008F31 /* SlideInPresentationManager.swift */,
+				A4FD06C01EE9AD4700F1D248 /* TabBarController */,
+				A4FD06BF1EE9ACF800F1D248 /* SlideTransitionDelegate */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -158,6 +159,24 @@
 				4EF048169855CE570F8333FA /* LICENSE */,
 			);
 			name = "Podspec Metadata";
+			sourceTree = "<group>";
+		};
+		A4FD06BF1EE9ACF800F1D248 /* SlideTransitionDelegate */ = {
+			isa = PBXGroup;
+			children = (
+				A449EAE61EE8BD5300008F31 /* SlideInPresentationAnimator.swift */,
+				A449EAE71EE8BD5300008F31 /* SlideInPresentationController.swift */,
+				A449EAE81EE8BD5300008F31 /* SlideInPresentationManager.swift */,
+			);
+			name = SlideTransitionDelegate;
+			sourceTree = "<group>";
+		};
+		A4FD06C01EE9AD4700F1D248 /* TabBarController */ = {
+			isa = PBXGroup;
+			children = (
+				A4FD06C11EE9AD7700F1D248 /* TabBarItemViewController.swift */,
+			);
+			name = TabBarController;
 			sourceTree = "<group>";
 		};
 		E7825E2DAD35765CDA32C85F /* Pods */ = {
@@ -377,6 +396,7 @@
 				A449EAE91EE8BD5300008F31 /* SlideInPresentationAnimator.swift in Sources */,
 				A449EAE51EE8956C00008F31 /* TableViewController.swift in Sources */,
 				A449EAEA1EE8BD5300008F31 /* SlideInPresentationController.swift in Sources */,
+				A4FD06C21EE9AD7700F1D248 /* TabBarItemViewController.swift in Sources */,
 				A449EAEB1EE8BD5300008F31 /* SlideInPresentationManager.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);

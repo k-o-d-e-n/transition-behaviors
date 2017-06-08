@@ -10,10 +10,13 @@ import UIKit
 import TransitionBehaviors
 
 class ViewController: UIViewController {
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        tabBarItem.title = "Controller"
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
 
     @IBAction func openViewController(_ sender: UIButton) {
@@ -45,7 +48,7 @@ class ViewController: UIViewController {
     
     
     @IBAction func replaceViewController(_ sender: UIButton) {
-        perform(presetTransition: .replace(last: 2), to: self, UIViewController.closedViewController(), animated: false)
+        perform(presetTransition: .navigationReplace(last: 2), to: self, UIViewController.closedViewController(), animated: false)
     }
     
     @IBAction func navigationRoot(_ sender: UIButton) {
@@ -58,11 +61,21 @@ class ViewController: UIViewController {
         customTransitionBehavior()
     }
     
+    @IBAction func pop(_ sender: UIButton) {
+        perform(presetTransition: .navigationPop, to: nil, animated: true)
+    }
+    
+    @IBAction func push(_ sender: UIButton) {
+        let vc = UIViewController()
+        vc.title = "Pushed View Controller"
+        vc.view.backgroundColor = .gray
+        perform(presetTransition: .navigationPush,
+                to: vc, storyboard!.instantiateViewController(withIdentifier: "ViewController"),
+                animated: true)
+    }
+    
     func customTransitionBehavior() {
         perform(transition: CustomTransitionBehavior(), to: [PopoverContentViewController()], animated: true)
-        //        perform(transition: AnyViewControllerBasedTransitionBehavior<ViewController, PopoverContentViewController>(available: { _ in true }, action: { s, t, a in
-        //            s.navigationRoot(UIButton())
-        //        }), to: [PopoverContentViewController()], animated: true)
     }
     
     static let transitioningDelegate = SlideInPresentationManager()
@@ -81,6 +94,7 @@ extension UIViewController {
         btn.setTitle("Close", for: .normal)
         btn.addTarget(vc, action: #selector(close(_:)), for: .touchUpInside)
         vc.view.addSubview(btn)
+        vc.tabBarItem.title = "Closable"
         
         return vc
     }
@@ -91,6 +105,11 @@ extension UIViewController {
 }
 
 class PopoverContentViewController: UIViewController {
+    
+    convenience init() {
+        self.init(nibName: nil, bundle: nil)
+        tabBarItem.title = "Popover"
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,15 +124,17 @@ class PopoverContentViewController: UIViewController {
         let vc = UIViewController.closedViewController()
         vc.view.backgroundColor = UIColor.green.withAlphaComponent(0.5)
         definesPresentationContext = true
-        perform(presetTransition:
+        perform(presetTransitionIfAvailable:
             .present(as:
-                .common(modalStyle: .overCurrentContext, transitionStyle: .crossDissolve), completion: {
-                    debugPrint(self.definesPresentationContext)
-                    debugPrint(vc.presentingViewController ?? "no presentation")
-                    debugPrint(vc.parent ?? "no parent")
-            }),
+                .common(modalStyle: .overCurrentContext, transitionStyle: .partialCurl)),
                 to: vc,
-                animated: true)
+                animated: true,
+                reserved: (.present(as:
+                    .common(modalStyle: .overCurrentContext, transitionStyle: .flipHorizontal), completion: {
+                        debugPrint(self.definesPresentationContext)
+                        debugPrint(vc.presentingViewController ?? "no presentation")
+                        debugPrint(vc.parent ?? "no parent")
+                }), false))
     }
     
 }

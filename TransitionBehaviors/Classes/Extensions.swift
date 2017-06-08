@@ -14,3 +14,5 @@ extension UINavigationController {
         return self.viewControllers.first
     }
 }
+
+extension String: Error {}

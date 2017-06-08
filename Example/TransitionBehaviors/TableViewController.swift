@@ -28,7 +28,7 @@ class TableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return 2
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -40,9 +40,20 @@ class TableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        perform(presetTransition: .push,
-                to: storyboard!.instantiateViewController(withIdentifier: "ViewController"),
+        perform(presetTransition: .navigationPush,
+                to: viewController(at: indexPath.row),
                 animated: true)
+    }
+    
+    func viewController(at row: Int) -> UIViewController {
+        switch row {
+        case 0:
+            return storyboard!.instantiateViewController(withIdentifier: "ViewController")
+        case 1:
+            return storyboard!.instantiateViewController(withIdentifier: "TabBarController")
+        default:
+            return UIViewController()
+        }
     }
 
     /*
