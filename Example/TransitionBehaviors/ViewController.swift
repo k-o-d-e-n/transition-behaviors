@@ -53,7 +53,16 @@ class ViewController: UIViewController {
     }
     
     @IBAction func preview(_ sender: UIButton) {
-        //
+        // TODO:
+        
+        customTransitionBehavior()
+    }
+    
+    func customTransitionBehavior() {
+        perform(transition: CustomTransitionBehavior(), to: [PopoverContentViewController()], animated: true)
+        //        perform(transition: AnyViewControllerBasedTransitionBehavior<ViewController, PopoverContentViewController>(available: { _ in true }, action: { s, t, a in
+        //            s.navigationRoot(UIButton())
+        //        }), to: [PopoverContentViewController()], animated: true)
     }
     
     static let transitioningDelegate = SlideInPresentationManager()
@@ -107,4 +116,15 @@ class PopoverContentViewController: UIViewController {
                 animated: true)
     }
     
+}
+
+struct CustomTransitionBehavior: ViewControllerBasedTransitionBehavior {
+    typealias Source = ViewController
+    func isAvailable(in sourceViewController: ViewController) -> Bool {
+        return true
+    }
+    
+    func perform(in sourceViewController: ViewController, to viewControllers: [PopoverContentViewController], animated: Bool) {
+        sourceViewController.openViewController(UIButton())
+    }
 }

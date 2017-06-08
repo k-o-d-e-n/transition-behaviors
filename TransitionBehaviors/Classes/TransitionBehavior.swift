@@ -99,13 +99,15 @@ struct AnyApplicationBasedTransitionBehavior: ApplicationBasedTransitionBehavior
 
 /// push (replace, navigationRoot), present, preview
 public protocol ViewControllerBasedTransitionBehavior {
-    func isAvailable<In: UIViewController>(in sourceViewController: In) -> Bool
-    func perform<In: UIViewController, To: UIViewController>(in sourceViewController: In, to viewControllers: [To], animated: Bool)
+    associatedtype Source: UIViewController
+    associatedtype Target: UIViewController
+    func isAvailable(in sourceViewController: Source) -> Bool
+    func perform(in sourceViewController: Source, to viewControllers: [Target], animated: Bool)
 }
 
 // TODO: Remove this extension after Apple fixed bug with convert array to variadic parameters
 extension ViewControllerBasedTransitionBehavior {
-    func perform<In: UIViewController, To: UIViewController>(in sourceViewController: In, to viewControllers: To ..., animated: Bool) {
+    func perform(in sourceViewController: Source, to viewControllers: Target ..., animated: Bool) {
         perform(in: sourceViewController, to: viewControllers, animated: animated)
     }
 }
@@ -115,24 +117,35 @@ public protocol PresentConfiguration {
     func prepare(forPresent controller: UIViewController)
 }
 
-public struct ViewControllerBasedTransition: ViewControllerBasedTransitionBehavior {
-    let base: ViewControllerBasedTransitionBehavior
+public struct ViewControllerBasedTransition<Source: UIViewController, Target: UIViewController>: ViewControllerBasedTransitionBehavior {
+//    let base: ViewControllerBasedTransitionBehavior
+    let isAvailable: (Source) -> Bool
+    let action: (Source, [Target], Bool) -> Void
     
-    public func isAvailable<In>(in sourceViewController: In) -> Bool where In : UIViewController {
-        return base.isAvailable(in: sourceViewController)
+    init<T: ViewControllerBasedTransitionBehavior>(base: T) where T.Source == Source, T.Target == Target {
+        isAvailable = base.isAvailable
+        action = base.perform
     }
     
-    public func perform<In, To>(in sourceViewController: In, to viewControllers: [To], animated: Bool) where In : UIViewController, To : UIViewController {
-        base.perform(in: sourceViewController, to: viewControllers, animated: animated)
+    public func isAvailable(in sourceViewController: Source) -> Bool {
+//        return base.isAvailable(in: sourceViewController)
+        return isAvailable(in: sourceViewController)
     }
     
-    public static let push = ViewControllerBasedTransition(base: Push())
+    public func perform(in sourceViewController: Source, to viewControllers: [Target], animated: Bool) {
+//        base.perform(in: sourceViewController, to: viewControllers, animated: animated)
+        action(sourceViewController, viewControllers, animated)
+    }
+    
+    public static var push: ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: Push())
+    }
     struct Push: ViewControllerBasedTransitionBehavior {
-        func isAvailable<In>(in sourceViewController: In) -> Bool where In : UIViewController {
+        func isAvailable(in sourceViewController: UIViewController) -> Bool {
             return sourceViewController.navigationController != nil
         }
         
-        func perform<In, To>(in sourceViewController: In, to viewController: [To], animated: Bool) where In : UIViewController, To : UIViewController {
+        func perform(in sourceViewController: UIViewController, to viewController: [UIViewController], animated: Bool) {
             let navController = sourceViewController.navigationController!
             navController.setViewControllers(navController.viewControllers + viewController,
                                              animated: true)
@@ -142,18 +155,20 @@ public struct ViewControllerBasedTransition: ViewControllerBasedTransitionBehavi
     // TODO: Add Pop behavior?
     
     // TODO: After transition to Swift 4, implement replace with range limited by one side
-    public static let replace = ViewControllerBasedTransition(base: Replace(last: 1))
-    public static func replace(last: Int) -> ViewControllerBasedTransition {
-        return ViewControllerBasedTransition(base: Replace(last: last))
+    public static var replace: ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: Replace(last: 1))
+    }
+    public static func replace(last: Int) -> ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: Replace(last: last))
     }
     struct Replace: ViewControllerBasedTransitionBehavior {
         let last: Int
         
-        func isAvailable<In>(in sourceViewController: In) -> Bool where In : UIViewController {
+        func isAvailable(in sourceViewController: UIViewController) -> Bool {
             return sourceViewController.navigationController.map { $0.viewControllers.count >= last } ?? false
         }
         
-        func perform<In, To>(in sourceViewController: In, to viewControllers: [To], animated: Bool) where In : UIViewController, To : UIViewController {
+        func perform(in sourceViewController: UIViewController, to viewControllers: [UIViewController], animated: Bool) {
             let navController = sourceViewController.navigationController!
             let stack = navController.viewControllers
             navController.setViewControllers(stack[0 ..< stack.count - last] + viewControllers,
@@ -161,30 +176,34 @@ public struct ViewControllerBasedTransition: ViewControllerBasedTransitionBehavi
         }
     }
     
-    public static let navigationRoot = ViewControllerBasedTransition(base: NavigationRoot())
+    public static var navigationRoot: ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: NavigationRoot())
+    }
     struct NavigationRoot: ViewControllerBasedTransitionBehavior {
-        func isAvailable<In>(in sourceViewController: In) -> Bool where In : UIViewController {
+        func isAvailable(in sourceViewController: UIViewController) -> Bool {
             return sourceViewController.navigationController != nil
         }
         
-        func perform<In, To>(in sourceViewController: In, to viewControllers: [To], animated: Bool) where In : UIViewController, To : UIViewController {
+        func perform(in sourceViewController: UIViewController, to viewControllers: [UIViewController], animated: Bool) {
             sourceViewController.navigationController!.setViewControllers(viewControllers, animated: animated)
         }
     }
     
-    public static let present = ViewControllerBasedTransition(base: Present(config: .common(modalStyle: .fullScreen, transitionStyle: .coverVertical), completion: nil))
-    public static func present(as configured: Present.Config, completion: (() -> Void)? = nil) -> ViewControllerBasedTransition {
-        return ViewControllerBasedTransition(base: Present(config: configured, completion: completion))
+    public static var present: ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: Present(config: .common(modalStyle: .fullScreen, transitionStyle: .coverVertical), completion: nil))
+    }
+    public static func present(as configured: Present.Config, completion: (() -> Void)? = nil) -> ViewControllerBasedTransition<UIViewController, UIViewController> {
+        return .init(base: Present(config: configured, completion: completion))
     }
     public struct Present: ViewControllerBasedTransitionBehavior {
         let config: Config
         let completion: (() -> Void)?
         
-        public func isAvailable<In>(in sourceViewController: In) -> Bool where In : UIViewController {
+        public func isAvailable(in sourceViewController: UIViewController) -> Bool {
             return sourceViewController.presentedViewController != nil && config.isAvailable(in: sourceViewController)
         }
         
-        public func perform<In, To>(in sourceViewController: In, to viewControllers: [To], animated: Bool) where In : UIViewController, To : UIViewController {
+        public func perform(in sourceViewController: UIViewController, to viewControllers: [UIViewController], animated: Bool) {
             config.prepare(forPresent: viewControllers.first!)
             sourceViewController.present(viewControllers.first!, animated: animated, completion: completion)
         }
@@ -259,38 +278,40 @@ public struct ViewControllerBasedTransition: ViewControllerBasedTransitionBehavi
     }
 }
 
-struct AnyViewControllerBasedTransitionBehavior: ViewControllerBasedTransitionBehavior {
-    typealias TransitionAvailable<In: UIViewController> = (In) -> Bool
-    typealias TransitionAction<In: UIViewController, To: UIViewController> = (_ in: In, _ to: [To], _ animated: Bool) -> Void
+public struct AnyViewControllerBasedTransitionBehavior<S: UIViewController, T: UIViewController>: ViewControllerBasedTransitionBehavior {
+    public typealias TransitionAvailable = (Source) -> Bool
+    public typealias TransitionAction = (Source, [Target], Bool) -> Void
     
-    private let available: TransitionAvailable<UIViewController>
-    private let action: TransitionAction<UIViewController, UIViewController>
+    private let available: TransitionAvailable
+    private let action: TransitionAction
     
-    init(available: @escaping TransitionAvailable<UIViewController>, action: @escaping TransitionAction<UIViewController, UIViewController>) {
-        self.available = available
+    public init(available: @escaping TransitionAvailable, action: @escaping TransitionAction) {
+        self.available = available 
         self.action = action
     }
     
-    func isAvailable<In>(in sourceViewController: In) -> Bool where In : UIViewController {
+    public func isAvailable(in sourceViewController: S) -> Bool {
         return available(sourceViewController)
     }
     
-    func perform<In, To>(in sourceViewController: In, to viewControllers: [To], animated: Bool) where In : UIViewController, To : UIViewController {
+    public func perform(in sourceViewController: S, to viewControllers: [T], animated: Bool) {
         action(sourceViewController, viewControllers, animated)
     }
 }
 
 public extension UIViewController {
-    func isAvailable(transition: ViewControllerBasedTransitionBehavior) -> Bool {
-        return transition.isAvailable(in: self)
+    func isAvailable<T: ViewControllerBasedTransitionBehavior>(transition: T) -> Bool {
+        return transition.isAvailable(in: self as! T.Source)
     }
     
-    func perform<To: UIViewController>(transition: ViewControllerBasedTransitionBehavior, to viewControllers: [To], animated: Bool) {
-        transition.perform(in: self, to: viewControllers, animated: animated)
+    func perform<T: ViewControllerBasedTransitionBehavior>(transition: T, to viewControllers: [T.Target], animated: Bool) {
+        transition.perform(in: self as! T.Source,
+                           to: viewControllers,
+                           animated: animated)
     }
     
     @discardableResult
-    func perform<To: UIViewController>(transitionIfAvailable transition: ViewControllerBasedTransitionBehavior, to viewControllers: [To], animated: Bool) -> Bool {
+    func perform<T: ViewControllerBasedTransitionBehavior>(transitionIfAvailable transition: T, to viewControllers: [T.Target], animated: Bool) -> Bool {
         guard isAvailable(transition: transition) else { return false }
         
         perform(transition: transition, to: viewControllers, animated: animated)
@@ -299,7 +320,7 @@ public extension UIViewController {
 }
 
 public extension UIViewController {
-    func perform<To: UIViewController>(presetTransition transition: ViewControllerBasedTransition, to viewControllers: To ..., animated: Bool) {
-        transition.perform(in: self, to: viewControllers, animated: animated)
+    func perform<Source: UIViewController, Target: UIViewController>(presetTransition transition: ViewControllerBasedTransition<Source, Target>, to viewControllers: Target ..., animated: Bool) {
+        transition.perform(in: self as! Source, to: viewControllers, animated: animated)
     }
 }
