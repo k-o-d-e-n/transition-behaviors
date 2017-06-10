@@ -58,13 +58,24 @@ class ViewController: UIViewController {
     @IBAction func preview(_ sender: UIButton) {
         // TODO:
         
-        customTransitionBehavior()
+        perform(presetTransition: .addChilds(layout: { (superview, subviews) in
+            UIView.animate(withDuration: 0.3, animations: { 
+                let subviewFrame = UIEdgeInsetsInsetRect(superview.frame, UIEdgeInsets(top: 100, left: 50, bottom: 100, right: 50))
+                subviews.forEach { $0.frame = subviewFrame }
+            })
+        }),
+                to: UIViewController.closedViewController(),
+                animated: true)
+//        customTransitionBehavior()
     }
     
     @IBAction func pop(_ sender: UIButton) {
-        perform(presetTransition: .navigationPop, to: nil, animated: true)
+        var vc: UIViewController? = nil
+        perform(presetTransition: .navigationPop(popped: &vc),
+                to: nil,
+                animated: true)
+        print(vc ?? "no popped")
     }
-    
     @IBAction func push(_ sender: UIButton) {
         let vc = UIViewController()
         vc.title = "Pushed View Controller"
@@ -100,7 +111,10 @@ extension UIViewController {
     }
     
     func close(_ sender: UIButton) {
-        dismiss(animated: true, completion: nil)
+        perform(presetTransitionIfAvailable: .dismissParent(on: 2),
+                to: self,
+                animated: true,
+                reserved: (.removeChilds, true))
     }
 }
 
@@ -134,7 +148,7 @@ class PopoverContentViewController: UIViewController {
                         debugPrint(self.definesPresentationContext)
                         debugPrint(vc.presentingViewController ?? "no presentation")
                         debugPrint(vc.parent ?? "no parent")
-                }), false))
+                }), true))
     }
     
 }
