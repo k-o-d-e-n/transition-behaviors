@@ -46,7 +46,6 @@ class ViewController: UIViewController {
                 animated: true)
     }
     
-    
     @IBAction func replaceViewController(_ sender: UIButton) {
         perform(presetTransition: .navigationReplace(last: 2), to: self, UIViewController.closedViewController(), animated: false)
     }

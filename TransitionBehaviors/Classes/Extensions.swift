@@ -42,4 +42,13 @@ extension UINavigationController {
     }
 }
 
+extension UIAlertController {
+    convenience init(title: String?, message: String?, actions: [UIAlertAction]) {
+        self.init(title: title, message: message, preferredStyle: .alert)
+        for action: UIAlertAction in actions {
+            addAction(action)
+        }
+    }
+}
+
 extension String: Error {}

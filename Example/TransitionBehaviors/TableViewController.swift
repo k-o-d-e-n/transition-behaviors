@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import TransitionBehaviors
 
 class TableViewController: UITableViewController {
 
@@ -40,9 +41,11 @@ class TableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        perform(presetTransition: .navigationPush,
-                to: viewController(at: indexPath.row),
-                animated: true)
+//        perform(presetTransition: .navigationPush,
+//                to: viewController(at: indexPath.row),
+//                animated: true)
+        FlowRouter.appRouter.perform(transitionUsing: FlowRouterPush(),
+                                     with: ([viewController(at: indexPath.row)], true))
     }
     
     func viewController(at row: Int) -> UIViewController {
