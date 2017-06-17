@@ -75,6 +75,10 @@ it, simply add the following line to your Podfile:
 pod "TransitionBehaviors"
 ```
 
+## Contributing
+
+[Here](https://github.com/k-o-d-e-n/transition-behaviors/blob/master/CONTRIBUTING.md)
+
 ## Author
 
 k-o-d-e-n, koden.u8800@gmail.com
