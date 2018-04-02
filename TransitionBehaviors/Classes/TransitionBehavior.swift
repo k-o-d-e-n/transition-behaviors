@@ -11,12 +11,12 @@ import Foundation
 // MARK: Application based
 
 /// application root, application present
-protocol ApplicationBasedTransitionBehavior {
+public protocol ApplicationBasedTransitionBehavior {
     func isAvailable(in application: UIApplication) -> Bool
     func perform<To: UIViewController>(in application: UIApplication, to viewController: To, animated: Bool)
 }
 
-extension UIApplication {
+public extension UIApplication {
     func isAvailable(transition: ApplicationBasedTransitionBehavior) -> Bool {
         return transition.isAvailable(in: self)
     }
@@ -33,19 +33,24 @@ extension UIApplication {
         return true
     }
 }
+public extension UIApplication {
+    func perform(presetTransition transition: ApplicationBasedTransition, to viewController: UIViewController, animated: Bool) {
+        perform(transition: transition, to: viewController, animated: animated)
+    }
+}
 
-struct ApplicationBasedTransition: ApplicationBasedTransitionBehavior {
+public struct ApplicationBasedTransition: ApplicationBasedTransitionBehavior {
     let base: ApplicationBasedTransitionBehavior
     
-    func isAvailable(in application: UIApplication) -> Bool {
+    public func isAvailable(in application: UIApplication) -> Bool {
         return base.isAvailable(in: application)
     }
     
-    func perform<To>(in application: UIApplication, to viewController: To, animated: Bool) where To : UIViewController {
+    public func perform<To>(in application: UIApplication, to viewController: To, animated: Bool) where To : UIViewController {
         base.perform(in: application, to: viewController, animated: animated)
     }
     
-    static let root = ApplicationBasedTransition(base: Root())
+    public static let root = ApplicationBasedTransition(base: Root())
     struct Root: ApplicationBasedTransitionBehavior {
         func isAvailable(in application: UIApplication) -> Bool {
             return UIApplication.shared.delegate?.window != nil
@@ -60,7 +65,7 @@ struct ApplicationBasedTransition: ApplicationBasedTransitionBehavior {
     }
     
     // TODO: Wrap ViewControllerBasedTransition`s as ApplicationBased ? 
-    static let present = ApplicationBasedTransition(base: Present())
+    public static let present = ApplicationBasedTransition(base: Present())
     struct Present: ApplicationBasedTransitionBehavior {
         func isAvailable(in application: UIApplication) -> Bool {
             return UIApplication.shared.delegate?.window??.rootViewController != nil
