@@ -58,9 +58,15 @@ public struct ApplicationBasedTransition: ApplicationBasedTransitionBehavior {
         
         func perform<To>(in application: UIApplication, to viewController: To, animated: Bool) where To : UIViewController {
             let window = UIApplication.shared.delegate!.window!!
-            window.rootViewController?.dismiss(animated: false, completion: nil)
-            window.rootViewController = viewController
-            window.makeKeyAndVisible()
+            if let _ = window.rootViewController?.presentedViewController {
+                window.rootViewController?.dismiss(animated: animated, completion: {
+                    window.rootViewController = viewController
+                    window.makeKeyAndVisible()
+                })
+            } else {
+                window.rootViewController = viewController
+                window.makeKeyAndVisible()
+            }
         }
     }
     
@@ -157,9 +163,9 @@ extension ViewControllerBasedTransition {
         }
         func perform(in sourceViewController: UIViewController, to viewControllers: [UIViewController], animated: Bool) {
             viewControllers.forEach { viewController in
-                sourceViewController.addChildViewController(viewController)
+                sourceViewController.addChild(viewController)
                 sourceViewController.view.addSubview(viewController.view)
-                viewController.didMove(toParentViewController: sourceViewController)
+                viewController.didMove(toParent: sourceViewController)
             }
             layout?(sourceViewController.view, viewControllers.map { $0.view })
         }
@@ -171,14 +177,14 @@ extension ViewControllerBasedTransition {
     /// Remove child view controller from source view controller.
     struct RemoveChilds: ViewControllerBasedTransitionBehavior {
         func isAvailable(in sourceViewController: UIViewController) -> Bool {
-            return sourceViewController.childViewControllers.count > 0
+            return sourceViewController.children.count > 0
         }
         func perform(in sourceViewController: UIViewController, to viewControllers: [UIViewController], animated: Bool) {
-            let removed = viewControllers.count > 0 ? viewControllers : sourceViewController.childViewControllers
+            let removed = viewControllers.count > 0 ? viewControllers : sourceViewController.children
             removed.forEach { viewController in
-                viewController.willMove(toParentViewController: nil)
+                viewController.willMove(toParent: nil)
                 viewController.view.removeFromSuperview()
-                viewController.removeFromParentViewController()
+                viewController.removeFromParent()
             }
         }
     }
@@ -569,12 +575,12 @@ public extension UIViewController {
 
 public extension UIViewController {
     func perform(presetTransition transition: ViewControllerBasedTransition<UIViewController, UIViewController>, to viewControllers: UIViewController? ..., animated: Bool) {
-        transition.perform(in: self, to: viewControllers.flatMap { $0 }, animated: animated)
+        transition.perform(in: self, to: viewControllers.compactMap { $0 }, animated: animated)
     }
     
     @discardableResult
     func perform(presetTransitionIfAvailable transition: ViewControllerBasedTransition<UIViewController, UIViewController>, to viewControllers: UIViewController? ..., animated: Bool, reserved: (ViewControllerBasedTransition<UIViewController, UIViewController>, Bool)) -> Bool {
-        let to = viewControllers.flatMap { $0 }
+        let to = viewControllers.compactMap { $0 }
         guard isAvailable(transition: transition) else {
             perform(transition: reserved.0, to: to, animated: reserved.1)
             return false
@@ -587,13 +593,13 @@ public extension UIViewController {
 
 public extension UINavigationController {
     func perform(navigationTransition transition: ViewControllerBasedTransition<UINavigationController, UIViewController>, to viewControllers: UIViewController? ..., animated: Bool) {
-        transition.perform(in: self, to: viewControllers.flatMap { $0 }, animated: animated)
+        transition.perform(in: self, to: viewControllers.compactMap { $0 }, animated: animated)
     }
 }
 
 public extension UITabBarController {
     func perform(tabBarTransition transition: ViewControllerBasedTransition<UITabBarController, UIViewController>, to viewControllers: UIViewController? ..., animated: Bool) {
-        transition.perform(in: self, to: viewControllers.flatMap { $0 }, animated: animated)
+        transition.perform(in: self, to: viewControllers.compactMap { $0 }, animated: animated)
     }
 }
 

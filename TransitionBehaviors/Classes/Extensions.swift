@@ -8,6 +8,30 @@
 
 import Foundation
 
+internal func debugAction(_ action: () -> Void) {
+    #if DEBUG
+        action()
+    #endif
+}
+
+internal func debugLog(_ message: String, _ file: String = #file, _ line: Int = #line) {
+    debugAction {
+        debugPrint("File: \(file)")
+        debugPrint("Line: \(line)")
+        debugPrint("Message: \(message)")
+    }
+}
+
+func debugFatalError(condition: @autoclosure () -> Bool = true,
+                     _ message: String = "", _ file: String = #file, _ line: Int = #line) {
+    debugAction {
+        if condition() {
+            debugLog(message, file, line)
+            fatalError(message)
+        }
+    }
+}
+
 extension UIViewController {
     func controllerOnMaxLevel(limited by: Int? = nil, in hierarchy: (UIViewController) -> UIViewController?) -> (Int, UIViewController?) {
         var currentLevel = 0

@@ -59,7 +59,7 @@ class ViewController: UIViewController {
         
         perform(presetTransition: .addChilds(layout: { (superview, subviews) in
             UIView.animate(withDuration: 0.3, animations: { 
-                let subviewFrame = UIEdgeInsetsInsetRect(superview.frame, UIEdgeInsets(top: 100, left: 50, bottom: 100, right: 50))
+                let subviewFrame = superview.frame.inset(by: UIEdgeInsets(top: 100, left: 50, bottom: 100, right: 50))
                 subviews.forEach { $0.frame = subviewFrame }
             })
         }),
@@ -109,7 +109,7 @@ extension UIViewController {
         return vc
     }
     
-    func close(_ sender: UIButton) {
+    @objc func close(_ sender: UIButton) {
         perform(presetTransitionIfAvailable: .dismissParent(on: 2),
                 to: self,
                 animated: true,
@@ -133,7 +133,7 @@ class PopoverContentViewController: UIViewController {
         view.addSubview(btn)
     }
     
-    func open(_ sender: UIButton) {
+    @objc func open(_ sender: UIButton) {
         let vc = UIViewController.closedViewController()
         vc.view.backgroundColor = UIColor.green.withAlphaComponent(0.5)
         definesPresentationContext = true

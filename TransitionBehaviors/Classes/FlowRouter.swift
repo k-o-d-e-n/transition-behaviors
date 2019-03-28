@@ -37,7 +37,7 @@ open class FlowRouter: NSObject, UINavigationControllerDelegate {
     /// Behavior contains types view presentation behavior.
     public struct Behavior {
         /// Change root controller
-        static let root = Behavior { (router, viewController, _) in // TODO: Not completed, not use now. Create setter in rootViewController property. What ?
+        public static let root = Behavior { (router, viewController, _) in // TODO: Not completed, not use now. Create setter in rootViewController property. What ?
             router.dissmissPresentedViewControllerIfNeeded(animated: false)
             router.appWindow??.rootViewController = viewController
             router.appWindow??.makeKeyAndVisible()
@@ -47,7 +47,7 @@ open class FlowRouter: NSObject, UINavigationControllerDelegate {
             }
         }
         /// Change root controller in current navigation controller
-        static let rootCurrentNavigation = Behavior(available: { $0.currentNavigationController != nil }, insert: { (router, viewController, _) in
+        public static let rootCurrentNavigation = Behavior(available: { $0.currentNavigationController != nil }, insert: { (router, viewController, _) in
             if router.currentNavigationController?.presentingViewController != nil {
                 router.set(presentedViewController: viewController)
             } else {
@@ -56,25 +56,25 @@ open class FlowRouter: NSObject, UINavigationControllerDelegate {
             router.currentNavigationController?.setViewControllers([viewController], animated: false)
         })
         /// Change root controller in main navigation controller
-        static let rootMainNavigation = Behavior(available: { $0.mainNavigationController != nil }, insert: { (router, viewController, _) in
+        public static let rootMainNavigation = Behavior(available: { $0.mainNavigationController != nil }, insert: { (router, viewController, _) in
             router.currentViewController = viewController
             router.mainNavigationController?.setViewControllers([viewController], animated: false)
         })
         /// Simple push view to navigation controller, if navigation controller not exists - not effect.
-        static let push = Behavior(available: { $0.currentNavigationController != nil }, insert: { (router, viewController, animated) in
+        public static let push = Behavior(available: { $0.currentNavigationController != nil }, insert: { (router, viewController, animated) in
             router.currentNavigationController?.pushViewController(viewController, animated: animated)
         })
         /// Simple present view on current view controller, if current view controller is presented - not effect.
-        static let present = Behavior(available: { $0.topViewController != nil && $0.topViewController!.definesPresentationContext },
+        public static let present = Behavior(available: { $0.topViewController != nil && $0.topViewController!.definesPresentationContext },
                                       insert: { (router, viewController, animated) in
             router.isInPerformPresentationTime = true
-            router.topViewController?.present(viewController, animated: animated) { _ in
+            router.topViewController?.present(viewController, animated: animated) {
                 router.set(presentedViewController: viewController)
                 router.isInPerformPresentationTime = false
             }
         })
         /// Removes last view controller from stack and push new controller without animation
-        static let replace = Behavior(available: { $0.currentNavigationController != nil && $0.currentNavigationController!.isEmpty }, insert: { (router, viewController, _) in
+        public static let replace = Behavior(available: { $0.currentNavigationController != nil && $0.currentNavigationController!.isEmpty }, insert: { (router, viewController, _) in
             var stack = router.currentNavigationController!.viewControllers
             stack[stack.count - 1] = viewController
             router.currentNavigationController?.viewControllers = stack
